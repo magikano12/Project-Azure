@@ -33,6 +33,18 @@ public class PlayerCharacter : MonoBehaviour
 
     [SerializeField]
     private ContactFilter2D groundContactFilter;
+
+    [SerializeField]
+    private Collider2D groundDetectTrigger;
+
+    private Collider2D[] groundHitDetectionResults = new Collider2D[16];
+
+    [SerializeField]
+    private PhysicsMaterial2D playerMovingPhysicsMaterial, playerStoppingPhysicsMaterial;
+
+    [SerializeField]
+    private Collider2D playerGroundCollider;
+    
 	// Use this for initialization
 	void Start ()
     {
@@ -40,19 +52,6 @@ public class PlayerCharacter : MonoBehaviour
         Debug.Log("Rawr");  //How to print to the console in Unity
         string pizza = "yum";
         Debug.Log(pizza);
-
-        //rigidbody2DInstance.gravityScale = 5;
-
-        /*if(hasKey)
-        {
-            float openTimer = 5;
-
-            for (int i = 0; i < openTimer; i++)
-            {
-                Debug.Log(i);
-            }
-            Debug.Log("Open the door after " + openTimer + " Seconds");
-        }*/
     }
 	
 	// Update is called once per frame
@@ -60,34 +59,56 @@ public class PlayerCharacter : MonoBehaviour
     {
         //transform.Translate(0, -.01f, 0); don't use because of physics
         //GetInput();
-        horizontalInput = Input.GetAxis("Horizontal");
-        if(Input.GetButtonDown("Jump"))
-        {
-            rigidbody2DInstance.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-        }
-        
+        UpdateIsOnGround();
+        UpdateHorizontalInput();
+        HandleJumpInput();
+
     }
 
     private void FixedUpdate()
     {
+        UpdatePhysicsMaterial();
         Move();
     }
 
-    /*private void GetInput()
+    private void UpdatePhysicsMaterial()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-    }*/
+        if(Mathf.Abs(horizontalInput)>0)
+        {
+            playerGroundCollider.sharedMaterial = playerMovingPhysicsMaterial;
+        }
+
+        else
+        {
+            playerGroundCollider.sharedMaterial = playerStoppingPhysicsMaterial;
+        }
+    }
+
+    private void UpdateIsOnGround()
+    {
+        isOnGround = groundDetectTrigger.OverlapCollider(groundContactFilter, groundHitDetectionResults) > 0;
+        //Debug.Log("IsOnGround?: " + isOnGround);
+    }
+
+    private void UpdateHorizontalInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+    }
+
+    private void HandleJumpInput()
+    {
+        if (Input.GetButtonDown("Jump") && isOnGround)
+        {
+            rigidbody2DInstance.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
+    }
+
     private void Move()
     {
-        //rigidbody2DInstance.velocity = new Vector2(horizontalInput, 0);
+
         rigidbody2DInstance.AddForce(Vector2.right * horizontalInput * accelerationForce);
         Vector2 clampedVelocity = rigidbody2DInstance.velocity;
         clampedVelocity.x = Mathf.Clamp(rigidbody2DInstance.velocity.x, -maxSpeed, maxSpeed);
         rigidbody2DInstance.velocity = clampedVelocity;
     }
-   /* private void MoveRight()
-    {
-        rigidbody2DInstance.velocity = new Vector2(5, 0);
-    }*/
-
 }
