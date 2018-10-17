@@ -44,6 +44,8 @@ public class PlayerCharacter : MonoBehaviour
 
     [SerializeField]
     private Collider2D playerGroundCollider;
+
+    private Checkpoint currentCheckpoint;
     
 	// Use this for initialization
 	void Start ()
