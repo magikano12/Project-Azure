@@ -46,6 +46,10 @@ public class PlayerCharacter : MonoBehaviour
     private Collider2D playerGroundCollider;
 
     private Checkpoint currentCheckpoint;
+
+    private Animator animator;
+    private bool isFacingRight = true;
+    private bool doubleJump = false;
     
 	// Use this for initialization
 	void Start ()
@@ -54,6 +58,7 @@ public class PlayerCharacter : MonoBehaviour
         Debug.Log("Rawr");  //How to print to the console in Unity
         string pizza = "yum";
         Debug.Log(pizza);
+        animator = GetComponent<Animator>();
     }
 	
 	// Update is called once per frame
@@ -90,6 +95,7 @@ public class PlayerCharacter : MonoBehaviour
     {
         isOnGround = groundDetectTrigger.OverlapCollider(groundContactFilter, groundHitDetectionResults) > 0;
         //Debug.Log("IsOnGround?: " + isOnGround);
+        animator.SetBool("Ground", isOnGround);
     }
 
     private void UpdateHorizontalInput()
@@ -99,9 +105,17 @@ public class PlayerCharacter : MonoBehaviour
 
     private void HandleJumpInput()
     {
-        if (Input.GetButtonDown("Jump") && isOnGround)
+        animator.SetFloat("VerticalSpeed", rigidbody2DInstance.velocity.y);
+        if (Input.GetButtonDown("Jump") && (isOnGround||!doubleJump))
         {
+            animator.SetBool("Ground", false);
             rigidbody2DInstance.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+
+            if(!doubleJump&&!isOnGround)
+            {
+                doubleJump = true;
+            }
+
         }
     }
 
@@ -112,6 +126,27 @@ public class PlayerCharacter : MonoBehaviour
         Vector2 clampedVelocity = rigidbody2DInstance.velocity;
         clampedVelocity.x = Mathf.Clamp(rigidbody2DInstance.velocity.x, -maxSpeed, maxSpeed);
         rigidbody2DInstance.velocity = clampedVelocity;
+        animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
+
+        if(isOnGround)
+        {
+            doubleJump = false;
+        }
+        if(horizontalInput>0&&!isFacingRight)
+        {
+            Flip();
+        }
+        if (horizontalInput < 0 && isFacingRight)
+        {
+            Flip();
+        }
+    }
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
     }
 
     public void Respawn()
