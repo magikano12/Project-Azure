@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 public class PlayerCharacter : MonoBehaviour
 {
     [SerializeField]
@@ -47,12 +49,13 @@ public class PlayerCharacter : MonoBehaviour
 
     private Checkpoint currentCheckpoint;
 
-    private Animator animator;
+    public Animator animator;
     private bool isFacingRight = true;
     private bool doubleJump = false;
-    
-	// Use this for initialization
-	void Start ()
+    private bool isDead;
+    public Text deathText;
+    // Use this for initialization
+    void Start ()
     {
         rigidbody2DInstance = GetComponent<Rigidbody2D>();
         Debug.Log("Rawr");  //How to print to the console in Unity
@@ -69,6 +72,7 @@ public class PlayerCharacter : MonoBehaviour
         UpdateIsOnGround();
         UpdateHorizontalInput();
         HandleJumpInput();
+        CheckForRespawn();
 
     }
 
@@ -149,17 +153,41 @@ public class PlayerCharacter : MonoBehaviour
         transform.localScale = theScale;
     }
 
+    public void Die()
+    {
+        isDead = true;
+        animator.SetBool("OnHazard", true);
+    }
     public void Respawn()
     {
-        if(currentCheckpoint==null)
+        isDead = false;
+        deathText.text = null;
+        rigidbody2DInstance.constraints = RigidbodyConstraints2D.FreezeRotation;
+        animator.SetBool("OnHazard", false);
+        if (currentCheckpoint == null)
+            {
+
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            }
+            else
+            {
+                rigidbody2DInstance.velocity = Vector2.zero;
+                transform.position = currentCheckpoint.transform.position;
+            }
+    }
+
+    private void CheckForRespawn()
+    {
+        if(isDead)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+            rigidbody2DInstance.constraints = RigidbodyConstraints2D.FreezeAll;
+            deathText.text = "Press R to Respawn!";
+
+            if (Input.GetButtonDown("Respawn"))
+            {
+                Respawn();
+            }
         }
-        else
-        {
-            rigidbody2DInstance.velocity = Vector2.zero;
-            transform.position = currentCheckpoint.transform.position;
-        }    
     }
     public void SetCurrentCheckpoint(Checkpoint newCurrentCheckpoint)
     {
