@@ -7,12 +7,6 @@ using UnityEngine.UI;
 public class PlayerCharacter : MonoBehaviour
 {
     [SerializeField]
-    private int lives = 3;
-
-    [SerializeField]
-    private string name = "Mario";
-
-    [SerializeField]
     private float jumpHeight = 5;
     
     [SerializeField]
@@ -24,14 +18,8 @@ public class PlayerCharacter : MonoBehaviour
     [SerializeField]
     private float jumpForce = 10;
 
-    private bool hasKey;
-
-    private bool isOnGround;
-
     [SerializeField]
     private Rigidbody2D rigidbody2DInstance;
-
-    private float horizontalInput;
 
     [SerializeField]
     private ContactFilter2D groundContactFilter;
@@ -39,16 +27,17 @@ public class PlayerCharacter : MonoBehaviour
     [SerializeField]
     private Collider2D groundDetectTrigger;
 
-    private Collider2D[] groundHitDetectionResults = new Collider2D[16];
-
     [SerializeField]
     private PhysicsMaterial2D playerMovingPhysicsMaterial, playerStoppingPhysicsMaterial;
 
     [SerializeField]
     private Collider2D playerGroundCollider;
 
+    private bool hasKey;
+    private bool isOnGround;
+    private float horizontalInput;
+    private Collider2D[] groundHitDetectionResults = new Collider2D[16];
     private Checkpoint currentCheckpoint;
-
     public Animator animator;
     private bool isFacingRight = true;
     private bool doubleJump = false;
@@ -58,9 +47,6 @@ public class PlayerCharacter : MonoBehaviour
     void Start ()
     {
         rigidbody2DInstance = GetComponent<Rigidbody2D>();
-        Debug.Log("Rawr");  //How to print to the console in Unity
-        string pizza = "yum";
-        Debug.Log(pizza);
         animator = GetComponent<Animator>();
     }
 	
@@ -98,7 +84,6 @@ public class PlayerCharacter : MonoBehaviour
     private void UpdateIsOnGround()
     {
         isOnGround = groundDetectTrigger.OverlapCollider(groundContactFilter, groundHitDetectionResults) > 0;
-        //Debug.Log("IsOnGround?: " + isOnGround);
         animator.SetBool("Ground", isOnGround);
     }
 
@@ -161,7 +146,7 @@ public class PlayerCharacter : MonoBehaviour
     public void Respawn()
     {
         isDead = false;
-        deathText.text = null;
+        deathText.text = "Press space twice to double jump!";
         rigidbody2DInstance.constraints = RigidbodyConstraints2D.FreezeRotation;
         animator.SetBool("OnHazard", false);
         if (currentCheckpoint == null)
