@@ -646,9 +646,9 @@ PlayerSettings:
     UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
-  cloudProjectId: 7dc2951f-3200-4f5e-9370-ddc35e2a040e
-  projectName: copy and delete
-  organizationId: magikano1
+  cloudProjectId: 3317a588-8e11-41d3-9b7d-f59c570a4280
+  projectName: Project Azure
+  organizationId: joshuarogers52
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
